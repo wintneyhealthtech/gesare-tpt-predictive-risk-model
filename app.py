@@ -2,15 +2,16 @@ import streamlit as st
 import pandas as pd
 import joblib
 
+st.set_page_config(page_title="TPT Delay Risk", page_icon="🩺")
+
 CD4_MEDIAN = 354.5
 
-@st.cache_resource
+@st.cache_resource(show_spinner=False)
 def load():
     return joblib.load('tpt_delay_model.pkl'), joblib.load('model_columns.pkl')
 
 model, cols = load()
 
-st.set_page_config(page_title="TPT Delay Risk", page_icon="🩺")
 st.title("TPT Initiation Delay Risk Tool")
 st.caption("Decision-support prototype. Estimates the risk that TPT will be started more than 6 months after ART.")
 
@@ -55,6 +56,18 @@ if st.button("Estimate risk"):
 
     X = pd.DataFrame([row])[cols]
     prob = model.predict_proba(X)[0, 1]
+
+    st.metric("Estimated risk of delayed TPT initiation", f"{prob*100:.0f}%")
+    if prob >= 0.60:
+        st.error("HIGH risk: prioritise TPT counselling and follow-up at the next visit.")
+    elif prob >= 0.40:
+        st.warning("MEDIUM risk: review TPT eligibility at the next visit.")
+    else:
+        st.success("LOWER risk: routine follow-up.")
+
+st.divider()
+st.caption("Proof of concept built on one facility's data (ROC-AUC about 0.70, validated by 5-fold cross-validation). "
+           "It supports, and does not replace, clinical judgement.")
 
     st.metric("Estimated risk of delayed TPT initiation", f"{prob*100:.0f}%")
     if prob >= 0.60:
