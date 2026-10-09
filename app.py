@@ -71,3 +71,4 @@ if st.button("Estimate risk"):
 st.divider()
 st.caption("Proof of concept built on one facility's data (ROC-AUC about 0.70, validated by 5-fold cross-validation). "
            "It supports, and does not replace, clinical judgement.")
+st.caption("Developed by Wintney Gesare Nyabuto | ENGAGE Capstone Project, 2026")
